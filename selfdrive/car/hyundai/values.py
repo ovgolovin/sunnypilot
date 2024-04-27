@@ -26,12 +26,13 @@ class CarControllerParams:
     self.STEER_STEP = 1  # 100 Hz
 
     if CP.carFingerprint in CANFD_CAR:
-      self.STEER_MAX = 270
-      self.STEER_DRIVER_ALLOWANCE = 250
+      upstream_taco = CP.safetyConfigs[-1].safetyParam & Panda.FLAG_HYUNDAI_UPSTREAM_TACO
+      self.STEER_MAX = 384
+      self.STEER_DRIVER_ALLOWANCE = 250 if not upstream_taco else 350
       self.STEER_DRIVER_MULTIPLIER = 2
-      self.STEER_THRESHOLD = 250
-      self.STEER_DELTA_UP = 2
-      self.STEER_DELTA_DOWN = 3
+      self.STEER_THRESHOLD = 250 if not upstream_taco else 350
+      self.STEER_DELTA_UP = 3
+      self.STEER_DELTA_DOWN = 7
 
     # To determine the limit for your car, find the maximum value that the stock LKAS will request.
     # If the max stock LKAS request is <384, add your car to this list.
@@ -74,6 +75,7 @@ class HyundaiFlagsSP(IntFlag):
   SP_CAMERA_SCC_LEAD = 8
   SP_LKAS12 = 16
   SP_RADAR_TRACKS = 32
+  SP_UPSTREAM_TACO = 64
 
 
 class CAR(StrEnum):
@@ -291,7 +293,7 @@ CAR_INFO: dict[str, HyundaiCarInfo | list[HyundaiCarInfo] | None] = {
   CAR.KIA_SORENTO_4TH_GEN: HyundaiCarInfo("Kia Sorento 2021-23", car_parts=CarParts.common([CarHarness.hyundai_k])),
   CAR.KIA_SORENTO_HEV_4TH_GEN: [
     HyundaiCarInfo("Kia Sorento Hybrid 2021-23", "All", car_parts=CarParts.common([CarHarness.hyundai_a])),
-    HyundaiCarInfo("Kia Sorento Plug-in Hybrid 2022-23", "All", car_parts=CarParts.common([CarHarness.hyundai_a])),
+    HyundaiCarInfo("Kia Sorento Plug-in Hybrid 2022-24", "All", car_parts=CarParts.common([CarHarness.hyundai_a])),
   ],
   CAR.KIA_STINGER: HyundaiCarInfo("Kia Stinger 2018-20", video_link="https://www.youtube.com/watch?v=MJ94qoofYw0",
                                   car_parts=CarParts.common([CarHarness.hyundai_c])),
